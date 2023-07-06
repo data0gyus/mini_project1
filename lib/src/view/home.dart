@@ -9,7 +9,8 @@ class HomeView extends GetView<HomeController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Firebase getx CREUD'),
+        centerTitle: true,
+        title: const Text('오늘의 할 일'),
         actions: [
           IconButton(
               onPressed: controller.signOut, icon: const Icon(Icons.logout))
@@ -18,7 +19,17 @@ class HomeView extends GetView<HomeController> {
       body: Obx(
         () => Column(
           children: [
+            const SizedBox(
+              height: 25,
+            ),
+            _date(),
+            const SizedBox(
+              height: 45,
+            ),
             _create(),
+            const SizedBox(
+              height: 40,
+            ),
             _todoList(),
           ],
         ),
@@ -28,15 +39,27 @@ class HomeView extends GetView<HomeController> {
 
   Widget _create() {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SizedBox(
-          width: 250,
-          child: TextField(
-            controller: controller.createController,
+          width: 300,
+          child: Container(
+            decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.white,
+                  width: 2.0,
+                ),
+                borderRadius: BorderRadius.circular(16.0)),
+            child: TextField(
+              decoration: InputDecoration(
+                border: InputBorder.none,
+              ),
+              controller: controller.createController,
+            ),
           ),
         ),
         ElevatedButton(
-            onPressed: controller.create, child: const Icon(Icons.send))
+            onPressed: controller.create, child: const Icon(Icons.add))
       ],
     );
   }
@@ -47,30 +70,58 @@ class HomeView extends GetView<HomeController> {
         itemCount: controller.todos.length,
         itemBuilder: (context, index) {
           final todoModel = controller.todos[index];
-          return ListTile(
-            leading: (todoModel.isDone!)
-                ? GestureDetector(
-                    onTap: () {
-                      controller.deleteTodo(todoModel.id!);
-                    },
-                    child: const Icon(
-                      Icons.check,
-                      color: Colors.green,
+          return Container(
+            margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            child: SizedBox(
+              height: 60,
+              child: Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 2.0,
                     ),
-                  )
-                : GestureDetector(
-                    onTap: () {
-                      controller.updateTodo(todoModel.id!);
-                    },
-                    child: const Icon(
-                      Icons.close,
-                      color: Colors.red,
-                    ),
+                    borderRadius: BorderRadius.circular(16.0)),
+                child: ListTile(
+                  trailing: (todoModel.isDone!)
+                      ? GestureDetector(
+                          onTap: () {
+                            controller.deleteTodo(todoModel.id!);
+                          },
+                          child: const Icon(
+                            Icons.check,
+                            color: Colors.green,
+                          ),
+                        )
+                      : GestureDetector(
+                          onTap: () {
+                            controller.updateTodo(todoModel.id!);
+                          },
+                          child: const Icon(
+                            Icons.close,
+                            color: Colors.red,
+                          ),
+                        ),
+                  title: Text(
+                    todoModel.todo,
+                    textAlign: TextAlign.center,
                   ),
-            title: Text(todoModel.todo),
-            subtitle: Text(todoModel.time.toString()),
+                ),
+              ),
+            ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _date() {
+    DateTime now = DateTime.now();
+    String formattedDate = ' ${now.month}월 ${now.day}일';
+    return Center(
+      child: Text(
+        '${formattedDate}',
+        style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
       ),
     );
   }
