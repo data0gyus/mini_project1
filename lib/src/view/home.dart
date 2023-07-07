@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mini_project/src/controller/home_controller.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
@@ -10,7 +11,7 @@ class HomeView extends GetView<HomeController> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text('오늘의 할 일'),
+        title: const Text('Todo List'),
         actions: [
           IconButton(
               onPressed: controller.signOut, icon: const Icon(Icons.logout))
@@ -19,17 +20,8 @@ class HomeView extends GetView<HomeController> {
       body: Obx(
         () => Column(
           children: [
-            const SizedBox(
-              height: 25,
-            ),
             _date(),
-            const SizedBox(
-              height: 45,
-            ),
             _create(),
-            const SizedBox(
-              height: 40,
-            ),
             _todoList(),
           ],
         ),
@@ -37,30 +29,51 @@ class HomeView extends GetView<HomeController> {
     );
   }
 
+  Widget _date() {
+    DateTime now = DateTime.now();
+    String formattedDate = ' ${now.month} / ${now.day}';
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 40),
+      child: Center(
+        child: Text(
+          formattedDate,
+          style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+
   Widget _create() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        SizedBox(
-          width: 300,
-          child: Container(
-            decoration: BoxDecoration(
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 30.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
                 border: Border.all(
                   color: Colors.white,
                   width: 2.0,
                 ),
-                borderRadius: BorderRadius.circular(16.0)),
-            child: TextField(
-              decoration: InputDecoration(
-                border: InputBorder.none,
+                borderRadius: BorderRadius.circular(16.0),
               ),
-              controller: controller.createController,
+              child: TextField(
+                controller: controller.createController,
+              ),
             ),
           ),
-        ),
-        ElevatedButton(
-            onPressed: controller.create, child: const Icon(Icons.add))
-      ],
+          Padding(
+            padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+            child: SizedBox(
+              height: 50,
+              width: 70,
+              child: ElevatedButton(
+                  onPressed: controller.create, child: const Icon(Icons.add)),
+            ),
+          )
+        ],
+      ),
     );
   }
 
@@ -70,58 +83,61 @@ class HomeView extends GetView<HomeController> {
         itemCount: controller.todos.length,
         itemBuilder: (context, index) {
           final todoModel = controller.todos[index];
+          final milliseconds = todoModel.time!.millisecondsSinceEpoch;
+          final dateTime = DateTime.fromMillisecondsSinceEpoch(milliseconds);
           return Container(
-            margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            child: SizedBox(
-              height: 60,
-              child: Container(
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.white,
-                      width: 2.0,
+            margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            height: 70,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.white,
+                width: 2,
+              ),
+              borderRadius: BorderRadius.circular(16.0),
+            ),
+            child: ListTile(
+              trailing: (todoModel.isDone!)
+                  ? GestureDetector(
+                      onTap: () {
+                        controller.deleteTodo(todoModel.id!);
+                      },
+                      child: const Icon(
+                        Icons.check,
+                        color: Colors.green,
+                      ),
+                    )
+                  : GestureDetector(
+                      onTap: () {
+                        controller.updateTodo(todoModel.id!);
+                      },
+                      child: const Icon(
+                        Icons.close,
+                        color: Colors.red,
+                      ),
                     ),
-                    borderRadius: BorderRadius.circular(16.0)),
-                child: ListTile(
-                  trailing: (todoModel.isDone!)
-                      ? GestureDetector(
-                          onTap: () {
-                            controller.deleteTodo(todoModel.id!);
-                          },
-                          child: const Icon(
-                            Icons.check,
-                            color: Colors.green,
-                          ),
-                        )
-                      : GestureDetector(
-                          onTap: () {
-                            controller.updateTodo(todoModel.id!);
-                          },
-                          child: const Icon(
-                            Icons.close,
-                            color: Colors.red,
-                          ),
-                        ),
-                  title: Text(
-                    todoModel.todo,
-                    textAlign: TextAlign.center,
-                  ),
+              title: Text(
+                todoModel.todo,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  decoration: todoModel.isDone!
+                      ? TextDecoration.lineThrough
+                      : TextDecoration.none,
+                ),
+              ),
+              subtitle: Text(
+                DateFormat('yyyy-MM-dd HH:mm').format(dateTime),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  decoration: todoModel.isDone!
+                      ? TextDecoration.lineThrough
+                      : TextDecoration.none,
                 ),
               ),
             ),
           );
         },
-      ),
-    );
-  }
-
-  Widget _date() {
-    DateTime now = DateTime.now();
-    String formattedDate = ' ${now.month}월 ${now.day}일';
-    return Center(
-      child: Text(
-        '${formattedDate}',
-        style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
       ),
     );
   }

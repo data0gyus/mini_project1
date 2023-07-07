@@ -3,6 +3,7 @@ import 'package:flutter_mini_project/src/binding/home_binding.dart';
 import 'package:flutter_mini_project/src/binding/login_binding.dart';
 import 'package:flutter_mini_project/src/constants/firebase_const.dart';
 import 'package:flutter_mini_project/src/view/home.dart';
+
 import 'package:flutter_mini_project/src/view/login.dart';
 import 'package:get/get.dart';
 
@@ -29,7 +30,7 @@ class AuthHandler extends GetxService {
       await auth.signInWithEmailAndPassword(email: email, password: password);
     } catch (e) {
       // ignore: avoid_print
-      print('?óê?ü¨');
+      print('error');
     }
   }
 
@@ -46,7 +47,7 @@ class AuthHandler extends GetxService {
       }
     } catch (e) {
       // ignore: avoid_print
-      print('?óê?ü¨');
+      print('error');
     }
   }
 }
